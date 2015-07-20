@@ -17,15 +17,19 @@ var jsonMessages = {
     {
       username: "David",
       text: "I don't know. Whatever!",
-      roomname: "Room 13"
+      roomname: "Room 13",
+      objectId: 0
     },
     {
       username: "Mila",
       text: "I know even less!",
-      roomname: "Room 13"
+      roomname: "Room 13",
+      objectId: 1
     }
   ]
-}
+};
+
+var lastId = 2;
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -48,21 +52,28 @@ var requestHandler = function(request, response) {
     var statusCode = 200;
     var headers = defaultCorsHeaders;
     headers['Content-Type'] = "application/json";
-    response.writeHead(statusCode, headers);
 
     if (request.method === "GET") {
+      response.writeHead(statusCode, headers);
       response.end(JSON.stringify(jsonMessages));
+
     } else if (request.method === "POST") {
+      headers['Content-Type'] = 'text/plain';
+      response.writeHead(statusCode, headers);
       var data = "";
       request.on('data', function(chuncks){
         data += chuncks;
       });
       request.on('end', function(){
-        jsonMessages.results.push(JSON.parse(data));
-        console.log(JSON.parse(data));
+        var newMessage = JSON.parse(data);
+        newMessage.objectId = lastId;
+        lastId++;
+        jsonMessages.results.push(newMessage);
+        console.log(newMessage);
         response.end('');
       });
     } else {
+      response.writeHead(statusCode, headers);
       response.end('');
     }
   }
