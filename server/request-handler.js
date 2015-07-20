@@ -49,7 +49,22 @@ var requestHandler = function(request, response) {
     var headers = defaultCorsHeaders;
     headers['Content-Type'] = "application/json";
     response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(jsonMessages));
+
+    if (request.method === "GET") {
+      response.end(JSON.stringify(jsonMessages));
+    } else if (request.method === "POST") {
+      var data = "";
+      request.on('data', function(chuncks){
+        data += chuncks;
+      });
+      request.on('end', function(){
+        jsonMessages.results.push(JSON.parse(data));
+        console.log(JSON.parse(data));
+        response.end('');
+      });
+    } else {
+      response.end('');
+    }
   }
   else {
     // The outgoing status.
