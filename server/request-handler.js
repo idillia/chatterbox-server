@@ -11,7 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-
+var fs = require("fs");
 var jsonMessages = {
   results: [
   ]
@@ -86,31 +86,61 @@ module.exports.requestHandler = function(request, response) {
       postMethod(request,response);
     }
 
-  } else {
-    // The outgoing status.
-    var statusCode = 404;
-
-    // See the note below about CORS headers.
+  } else if (request.url === "/") {
+    var statusCode = 200;
     var headers = defaultCorsHeaders;
-
-    // Tell the client we are sending them plain text.
-    //
-    // You will need to change this if you are sending something
-    // other than plain text, like JSON or HTML.
-    headers['Content-Type'] = "text/plain";
-
-    // .writeHead() writes to the request line and headers of the response,
-    // which includes the status and all headers.
+    headers['Content-Type'] = "text/html";
     response.writeHead(statusCode, headers);
 
-    // Make sure to always call response.end() - Node may not send
-    // anything back to the client until you do. The string you pass to
-    // response.end() will be the body of the response - i.e. what shows
-    // up in the browser.
-    //
-    // Calling .end "flushes" the response's internal buffer, forcing
-    // node to actually send all the data over to the client.
-    response.end("Not found!");
+    fs.readFile('client/index.html', function(err, data){
+      if (err) throw err;
+      response.end(data);
+    });
+
+  } else {
+    fs.readFile('client' + request.url, function(err, data){
+      if (err) {
+        // The outgoing status.
+        var statusCode = 404;
+
+        // See the note below about CORS headers.
+        var headers = defaultCorsHeaders;
+
+        // Tell the client we are sending them plain text.
+        //
+        // You will need to change this if you are sending something
+        // other than plain text, like JSON or HTML.
+        headers['Content-Type'] = "text/plain";
+
+        // .writeHead() writes to the request line and headers of the response,
+        // which includes the status and all headers.
+        response.writeHead(statusCode, headers);
+
+        // Make sure to always call response.end() - Node may not send
+        // anything back to the client until you do. The string you pass to
+        // response.end() will be the body of the response - i.e. what shows
+        // up in the browser.
+        //
+        // Calling .end "flushes" the response's internal buffer, forcing
+        // node to actually send all the data over to the client.
+        response.end("Not found!");
+
+      }
+      else {
+        var mimeTypes = {js:"application/javascript", css:"text/css", gif: "image/gif"};
+        var statusCode = 200;
+        var headers = defaultCorsHeaders;
+        headers['Content-Type'] = "text/html";
+
+        var extension = request.url.split('.').pop();
+        if (mimeTypes.hasOwnProperty(extension)){
+          headers['Content-Type'] = mimeTypes[extension];
+        }
+
+        response.writeHead(statusCode, headers);
+        response.end(data);
+      }
+    });  
   }
 };
 
