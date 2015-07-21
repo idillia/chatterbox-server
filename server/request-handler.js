@@ -39,7 +39,7 @@ var postMethod = function(request,response){
 
 };
 
-var requestHandler = function(request, response) {
+module.exports.requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -73,6 +73,11 @@ var requestHandler = function(request, response) {
     }
   } else if (request.url.match(/^\/send/)) {
     postMethod(request,response);
+  } else if (request.url.match(/^\/classes\/room/)) {
+    var statusCode = 200;
+    var headers = defaultCorsHeaders;
+    headers['Content-Type'] = "application/json";
+
   } else {
     // The outgoing status.
     var statusCode = 404;
@@ -116,6 +121,3 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
-
-module.exports = requestHandler;
-
