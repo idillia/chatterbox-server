@@ -6,15 +6,18 @@
   "license": "Copyright 2013, Hack Reactor. All rights reserved.",
   "scripts": {
     "test": "mocha server/spec",
-    "start": "node server/express.js"
+    "start": "node server/express.js",
+    "postinstall": "./node_modules/bower/bin/bower install"
   },
   "devDependencies": {
     "mocha": "^1.21.4",
     "request": "^2.34.0",
-    "chai": "^1.9.0"
+    "chai": "^1.9.0",
+    
   },
   "dependencies": {
     "body-parser": "^1.13.2",
-    "express": "^4.13.1"
+    "express": "^4.13.1",
+    "bower": "1.3.x"
   }
 }
