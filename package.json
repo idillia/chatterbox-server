@@ -1,7 +1,7 @@
 {
   "name": "chatterbox",
   "version": "0.0.1",
-  "main": "server/basic-server.js",
+  "main": "server/express.js",
   "author": "Hack Reactor",
   "license": "Copyright 2013, Hack Reactor. All rights reserved.",
   "scripts": {
