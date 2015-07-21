@@ -78,6 +78,14 @@ module.exports.requestHandler = function(request, response) {
     var headers = defaultCorsHeaders;
     headers['Content-Type'] = "application/json";
 
+    if (request.method === "GET") {
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(jsonMessages));
+    }
+    else if (request.method === "POST") {
+      postMethod(request,response);
+    }
+
   } else {
     // The outgoing status.
     var statusCode = 404;
