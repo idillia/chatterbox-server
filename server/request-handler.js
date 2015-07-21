@@ -14,22 +14,30 @@ this file and include it in basic-server.js so that it actually works.
 
 var jsonMessages = {
   results: [
-    {
-      username: "David",
-      text: "I don't know. Whatever!",
-      roomname: "Room 13",
-      objectId: 0
-    },
-    {
-      username: "Mila",
-      text: "I know even less!",
-      roomname: "Room 13",
-      objectId: 1
-    }
   ]
 };
 
 var lastId = 2;
+
+var postMethod = function(request,response){
+  var statusCode = 201;
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = 'text/plain';
+  response.writeHead(statusCode, headers);
+  var data = "";
+  request.on('data', function(chuncks){
+    data += chuncks;
+  });
+  request.on('end', function(){
+    var newMessage = JSON.parse(data);
+    newMessage.objectId = lastId;
+    lastId++;
+    jsonMessages.results.push(newMessage);
+    console.log(newMessage);
+    response.end('');
+  });
+
+};
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -58,26 +66,14 @@ var requestHandler = function(request, response) {
       response.end(JSON.stringify(jsonMessages));
 
     } else if (request.method === "POST") {
-      headers['Content-Type'] = 'text/plain';
-      response.writeHead(statusCode, headers);
-      var data = "";
-      request.on('data', function(chuncks){
-        data += chuncks;
-      });
-      request.on('end', function(){
-        var newMessage = JSON.parse(data);
-        newMessage.objectId = lastId;
-        lastId++;
-        jsonMessages.results.push(newMessage);
-        console.log(newMessage);
-        response.end('');
-      });
+      postMethod(request,response);
     } else {
       response.writeHead(statusCode, headers);
       response.end('');
     }
-  }
-  else {
+  } else if (request.url.match(/^\/send/)) {
+    postMethod(request,response);
+  } else {
     // The outgoing status.
     var statusCode = 404;
 
