@@ -11,13 +11,24 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+
 var fs = require("fs");
 var jsonMessages = {
   results: [
-  ]
+  ],
+  lastId: 0
 };
 
-var lastId = 2;
+var storageFile = "messages.json";
+fs.readFile(storageFile, function(err, data) {
+  if (err) {
+    fs.writeFile(storageFile, JSON.stringify(jsonMessages));
+  }
+  else {
+    jsonMessages = JSON.parse(data);
+  }
+
+});
 
 var postMethod = function(request,response){
   var statusCode = 201;
@@ -30,9 +41,12 @@ var postMethod = function(request,response){
   });
   request.on('end', function(){
     var newMessage = JSON.parse(data);
-    newMessage.objectId = lastId;
-    lastId++;
+    newMessage.objectId = jsonMessages.lastId;
+    jsonMessages.lastId++;
     jsonMessages.results.push(newMessage);
+
+    fs.writeFile(storageFile, JSON.stringify(jsonMessages));
+
     console.log(newMessage);
     response.end('');
   });
